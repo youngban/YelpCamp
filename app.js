@@ -3,6 +3,7 @@ var express = require("express"),
     bodyParser = require("body-parser"),
     mongoose   = require("mongoose"),
     Stadium    = require("./models/stadium"),
+    Comment    = require("./models/comment"),
     seedDB     = require("./seeds")
 
 
@@ -22,7 +23,7 @@ app.get("/stadiums", function(req, res){
         if(err){
             console.log(err);
         } else {
-            res.render("index", {stadiums:allstadiums});
+            res.render("stadiums/index", {stadiums:allstadiums});
         }
     })
 });
@@ -46,7 +47,7 @@ app.post("/stadiums", function(req, res){
 
 //NEW - show form to create new stadiums
 app.get("/stadiums/new", function(req, res) {
-    res.render("new");
+    res.render("stadiums/new");
 }); 
 
 //SHOW - show info about one stadiums
@@ -55,10 +56,48 @@ app.get("/stadiums/:id", function(req, res) {
         if(err){
             console.log(err);
         } else {
-            res.render("show", {stadiums:foundStadium});
+            res.render("stadiums/show", {stadium:foundStadium});
         }
     });
 })
+
+// COMMENTS ROUTES
+// COMMENTS ROUTES
+// COMMENTS ROUTES
+
+app.get("/stadiums/:id/comments/new", function(req, res) {
+    //find stadium by id
+    Stadium.findById(req.params.id, function(err, stadium){
+        if(err){
+            console.log(err);
+        } else {
+            res.render("comments/new", {stadium:stadium});
+        }
+    })
+});
+
+app.post("/stadiums/:id/comments", function(req, res){
+    //lookup stadiums using Id
+    Stadium.findById(req.params.id, function(err, stadium) {
+        if(err){
+            console.log(err);
+            res.redirect("/stadiums");
+        } else {
+            //create new comment - comment[text], [author]
+            Comment.create(req.body.comment, function(err, comment){
+                if(err){
+                    console.log(err);
+                } else {
+                    //connect new comment to stadium
+                    stadium.comments.push(comment);
+                    stadium.save();
+                    res.redirect("/stadiums/" + stadium._id);
+                }
+            }) 
+        }
+    })
+});
+
 app.listen(process.env.PORT, process.env.IP, function(){
     console.log("Server has started!");
 });
