@@ -5,5 +5,11 @@
 <img src="<%= stadiums.img %>">
 
 <p><%= stadiums.description %></p>
+
+<% stadiums.comments.forEach(function(comment){ %>
+    <p>
+        <strong><%= comment.author %></strong> - <%= comment.text %>
+    </p>
+<% })   %>  
                 
 <% include partials/footer %></img>

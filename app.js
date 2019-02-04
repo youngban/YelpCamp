@@ -1,21 +1,15 @@
 var express = require("express"),
     app     = express(),
     bodyParser = require("body-parser"),
-    mongoose   = require("mongoose")
+    mongoose   = require("mongoose"),
+    Stadium    = require("./models/stadium"),
+    seedDB     = require("./seeds")
+
 
 mongoose.connect("mongodb://localhost:27017/stadiums", {useNewUrlParser:true});
 app.use(bodyParser.urlencoded({extended:true}));
 app.set("view engine", "ejs");
-
-// SCHEMA SETUP
-var stadiumsSchema = new mongoose.Schema({
-    name:String,
-    img :String,
-    description:String
-});
-
-var Stadium = mongoose.model("Stadium", stadiumsSchema);
-
+seedDB();
     
 app.get("/", function(req, res){
     res.render("landing");
@@ -57,7 +51,7 @@ app.get("/stadiums/new", function(req, res) {
 
 //SHOW - show info about one stadiums
 app.get("/stadiums/:id", function(req, res) {
-    Stadium.findById(req.params.id, function(err, foundStadium){
+    Stadium.findById(req.params.id).populate("comments").exec(function(err, foundStadium){
         if(err){
             console.log(err);
         } else {
