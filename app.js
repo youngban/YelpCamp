@@ -1,9 +1,12 @@
-var express = require("express"),
-    app     = express(),
+var express    = require("express"),
+    app        = express(),
     bodyParser = require("body-parser"),
     mongoose   = require("mongoose"),
+    passport   = require("passport"),
+    LocalStrategy = require("passport-local"),
     Stadium    = require("./models/stadium"),
     Comment    = require("./models/comment"),
+    User       = require("./models/user"),
     seedDB     = require("./seeds")
 
 
@@ -13,6 +16,24 @@ app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/public"));
 seedDB();
     
+    
+//PASSPORT CONFIGURTION
+app.use(require("express-session")({
+    secret:"OldTrafford is Field of Dream",
+    resave: false,
+    saveUninitialized: false
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+app.use(function(req, res, next){
+    res.locals.currentUser = req.user;
+    next();
+});
+
 app.get("/", function(req, res){
     res.render("landing");
 });
@@ -20,13 +41,13 @@ app.get("/", function(req, res){
 //INDEX - show all stadiums
 app.get("/stadiums", function(req, res){
     // Db에서 얻어오기
-    Stadium.find({}, function(err, allstadiums){
+    Stadium.find({}, function(err, allStadiums){
         if(err){
             console.log(err);
         } else {
-            res.render("stadiums/index", {stadiums:allstadiums});
+            res.render("stadiums/index", {stadiums:allStadiums});
         }
-    })
+    });
 });
 
 //CREATE - add new stadiums
@@ -94,9 +115,40 @@ app.post("/stadiums/:id/comments", function(req, res){
                     stadium.save();
                     res.redirect("/stadiums/" + stadium._id);
                 }
-            }) 
+            }); 
         }
-    })
+    });
+});
+
+// AUTH ROUTES
+app.get("/register", function(req, res) {
+    res.render("register");
+});
+
+app.post("/register", function(req, res) {
+    var newUser= new User({username:req.body.username});
+    User.register(newUser, req.body.password, function(err, user){
+        if(err){
+            console.log(err);
+            return res.render("register");
+        } 
+            passport.authenticate("local")(req, res, function(){
+                res.redirect("/stadiums");
+            });
+    });
+});
+
+//show login form
+app.get("/login", function(req, res) {
+    res.render("login");
+});
+
+//login, middleware, callback
+app.post("/login", passport.authenticate("local", 
+    {
+        successRedirect:"/stadiums",
+        failureRedirect:"/login"
+    }), function(req, res) {
 });
 
 app.listen(process.env.PORT, process.env.IP, function(){

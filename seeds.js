@@ -22,12 +22,12 @@ var data = [
  
 function seedDB(){
    //Remove all stadiums
-   Stadium.remove({}, function(err){
+   Stadium.deleteMany({}, function(err){
         if(err){
             console.log(err);
         }
         console.log("removed stadiums!");
-        Comment.remove({}, function(err) {
+        Comment.deleteMany({}, function(err) {
             if(err){
                 console.log(err);
             }
