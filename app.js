@@ -87,7 +87,7 @@ app.get("/stadiums/:id", function(req, res) {
 // COMMENTS ROUTES
 // COMMENTS ROUTES
 
-app.get("/stadiums/:id/comments/new", function(req, res) {
+app.get("/stadiums/:id/comments/new", isLoggedIn, function(req, res) {
     //find stadium by id
     Stadium.findById(req.params.id, function(err, stadium){
         if(err){
@@ -98,7 +98,7 @@ app.get("/stadiums/:id/comments/new", function(req, res) {
     })
 });
 
-app.post("/stadiums/:id/comments", function(req, res){
+app.post("/stadiums/:id/comments", isLoggedIn, function(req, res){
     //lookup stadiums using Id
     Stadium.findById(req.params.id, function(err, stadium) {
         if(err){
@@ -150,6 +150,18 @@ app.post("/login", passport.authenticate("local",
         failureRedirect:"/login"
     }), function(req, res) {
 });
+
+app.get("/logout", function(req, res){
+    req.logout();
+    res.redirect("/stadiums")
+})
+
+function isLoggedIn(req, res, next){
+    if(req.isAuthenticated()){
+        return next();
+    }
+    res.redirect("/login");
+}
 
 app.listen(process.env.PORT, process.env.IP, function(){
     console.log("Server has started!");
