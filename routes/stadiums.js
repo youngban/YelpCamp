@@ -1,62 +1,50 @@
-var express = require("express");
+var express = require("express"),
+    passport= require("passport");
 var router  = express.Router();
-var Stadium = require("../models/stadium");
+var User    = require("../models/user");
 
-//INDEX - show all stadiums
+
+//root routes
 router.get("/", function(req, res){
-    // Db에서 얻어오기
-    Stadium.find({}, function(err, allStadiums){
+    res.render("landing");
+});
+
+//show register form
+router.get("/register", function(req, res) {
+    res.render("register");
+});
+
+//handle sign up logic
+router.post("/register", function(req, res) {
+    var newUser= new User({username:req.body.username});
+    User.register(newUser, req.body.password, function(err, user){
         if(err){
             console.log(err);
-        } else {
-            res.render("stadiums/index", {stadiums:allStadiums});
-        }
+            return res.render("register");
+        } 
+            passport.authenticate("local")(req, res, function(){
+                res.redirect("/stadiums");
+            });
     });
 });
 
-//CREATE - add new stadiums
-router.post("/", isLoggedIn, function(req, res){
-    // 폼에서 데이터 얻어오기, 스타디움 array 추가
-    var name = req.body.name;
-    var img = req.body.img;
-    var desc = req.body.description;
-    var author = {
-        id: req.user._id,
-        username: req.user.username
-    }
-    var newStadiums = {name:name, img:img, description:desc, author:author}
-    // 새로운 스타디움 Db에 저장
-    Stadium.create(newStadiums, function(err, newlyCreated){
-        if(err){
-            console.log(err);
-        }else {
-            res.redirect("/stadiums");
-        }
-    });
+//show login form
+router.get("/login", function(req, res) {
+    res.render("login");
 });
 
-//NEW - show form to create new stadiums
-router.get("/new", isLoggedIn, function(req, res) {
-    res.render("stadiums/new");
-}); 
-
-//SHOW - show info about one stadiums
-router.get("/:id", function(req, res) {
-    Stadium.findById(req.params.id).populate("comments").exec(function(err, foundStadium){
-        if(err){
-            console.log(err);
-        } else {
-            res.render("stadiums/show", {stadium:foundStadium});
-        }
-    });
+//login, middleware, callback
+router.post("/login", passport.authenticate("local", 
+    {
+        successRedirect:"/stadiums",
+        failureRedirect:"/login"
+    }), function(req, res) {
 });
 
-//middleware
-function isLoggedIn(req, res, next){
-    if(req.isAuthenticated()){
-        return next();
-    }
-    res.redirect("/login");
-}
+// logout route
+router.get("/logout", function(req, res){
+   req.logout();
+   res.redirect("/stadiums");
+});
 
 module.exports = router;

@@ -19,6 +19,12 @@
                     <p>
                         <em>Submitted By <%= stadium.author.username %></em>
                     </p>
+                    <% if(currentUser && stadium.author.id.equals(currentUser._id)){ %>
+                        <a class="btn btn-warning" href="/stadiums/<%= stadium._id %>/edit">Edit</a>
+                        <form class="delete-form" action="/stadiums/<%= stadium._id %>?_method=DELETE" method="POST">
+                            <button class="btn btn-danger">Delete</button>
+                        </form>
+                    <% } %>
                 </div>
             </div>
             <div class="well">
@@ -34,6 +40,14 @@
                                <p>
                                     <%= comment.text %>
                                </p>
+                               <% if(currentUser && comment.author.id.equals(currentUser._id)){ %>
+                                    <a class="btn btn-xs btn-warning" 
+                                    href="/stadiums/<%= stadium._id %>/comments/<%= comment._id %>/edit">Edit
+                                    </a>
+                                    <form class="delete-form" action="/stadiums/<%= stadium._id %>/comments/<%= comment._id %>?_method=DELETE" method="POST">
+                                    <input type="submit" class="btn btn-xs btn-danger" value="Delete">
+                               </form>
+                               <% } %>
                         </div>
                     </div>
                 <% })   %>  
@@ -41,6 +55,5 @@
         </div>
     </div>
 </div>
-                
             
 <% include ../partials/footer %>
