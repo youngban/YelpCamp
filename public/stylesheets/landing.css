@@ -1,0 +1,82 @@
+body {
+    background-color: #000;
+}
+
+#landing-header {
+  z-index: 1;
+  position: relative;
+  text-align: center;
+  padding-top: 40vh;
+}
+
+#landing-header h1 {
+  color: #fff;
+}
+
+.slideshow { 
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.slideshow li { 
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-size: cover;
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+  opacity: 0;
+  z-index: 0;
+  animation: imageAnimation 50s linear infinite; 
+}
+
+.slideshow li:nth-child(1) { 
+  background-image: url(http://hqwallpapersgalaxy.com/Uploads/27-6-2018/34395/thumb2-manchester-football-stadium-modern-stadium-old-trafford-trafford.jpg); 
+}
+.slideshow li:nth-child(2) { 
+  background-image: url(http://file2.instiz.net/data/file/20140826/1/b/a/1baff51976b9f711a8fbcd5feff7c68b.jpg);
+  animation-delay: 10s; 
+}
+.slideshow li:nth-child(3) { 
+  background-image: url(http://nlcollection.nl.go.kr/resources/upload/ckfile/images/2017b_rb000005_i01.JPG);
+  animation-delay: 20s; 
+}
+.slideshow li:nth-child(4) { 
+  background-image: url(https://images.performgroup.com/di/library/GOAL/87/50/wembley-general-view_kxuhfo444qa21jvknp88yg8y1.jpg?t=-57493302&quality=60&w=1600);
+  animation-delay: 30s; 
+}
+.slideshow li:nth-child(5) { 
+  background-image: url(https://image.fmkorea.com/files/attach/images/3658281/751/446/005/f0083602_493e74a8b3fc4.jpg);
+  animation-delay: 40s; 
+}
+
+@keyframes imageAnimation { 
+  0% { 
+    opacity: 0; 
+    animation-timing-function: ease-in;
+  }
+  10% {
+    opacity: 1;
+    animation-timing-function: ease-out;
+  }
+  20% {
+    opacity: 1
+  }
+  30% {
+    opacity: 0
+  }
+}
+
+/* Older browser support - .no-cssanimations class added by modernizr */
+.no-cssanimations .slideshow li {
+	opacity: 1;
+}
