@@ -44,8 +44,9 @@ router.get("/new", middleware.isLoggedIn, function(req, res) {
 //SHOW - show info about one stadiums
 router.get("/:id", function(req, res) {
     Stadium.findById(req.params.id).populate("comments").exec(function(err, foundStadium){
-        if(err){
-            console.log(err);
+        if(err || !foundStadium){
+            req.flash("error", "Stadium not found");
+            return res.redirect("back");
         } else {
             res.render("stadiums/show", {stadium:foundStadium});
         }

@@ -47,12 +47,18 @@ router.post("/", middleware.isLoggedIn, function(req, res){
 
 //COMMENT EDIT 
 router.get("/:comment_id/edit", middleware.checkCommentOwnership, function(req, res){
-    Comment.findById(req.params.comment_id, function(err, foundComment){
-        if(err){
-            res.redirect("back");
-        } else {
-            res.render("comments/edit", {stadium_id:req.params.id, comment:foundComment});
+    Stadium.findById(req.params.id, function(err, foundStadium){
+        if(err || !foundStadium){
+            req.flash("error", "No stadium found");
+            return res.redirect("back");
         }
+        Comment.findById(req.params.comment_id, function(err, foundComment){
+            if(err){
+                res.redirect("back");
+            } else {
+                res.render("comments/edit", {stadium_id:req.params.id, comment:foundComment});
+            }
+        });
     });
 });
 
